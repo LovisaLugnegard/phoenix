@@ -548,7 +548,7 @@ def browserService(alternateSuiteName, browser):
 	if browser == 'chrome':
 		return [{
 			'name': 'selenium',
-			'image': 'selenium/standalone-chrome-debug:3.141.59-yttrium',
+			'image': 'selenium/standalone-chrome-debug:latest',
 			'pull': 'always',
 			'volumes': [{
 				'name': 'uploads',
