@@ -2,6 +2,7 @@ import { setDefaultTimeout, After, Before, defineParameterType } from 'cucumber'
 import { createSession, closeSession, client, startWebDriver, stopWebDriver } from 'nightwatch-api'
 import { rollbackConfigs, setConfigs, cacheConfigs } from './helpers/config'
 import { getAllLogsWithDateTime } from './helpers/browserConsole.js'
+
 const codify = require('./helpers/codify')
 
 const ldap = require('./helpers/ldapHelper')
@@ -34,6 +35,7 @@ Before(function createSessionForEnv () {
 })
 
 Before(function logSessionInfoOnSauceLabs () {
+  console.log(client.sessionId)
   if (process.env.SAUCE_USERNAME) {
     return client
       .session(function (session) {
@@ -86,6 +88,7 @@ Before(function cacheAndSetConfigsOnRemoteIfExists () {
 
 // After hooks are run in reverse order in which they are defined
 // https://github.com/cucumber/cucumber-js/blob/master/docs/support_files/hooks.md#hooks
+
 After(function rollbackConfigsOnRemoteIfExists () {
   if (client.globals.ocis) {
     return
@@ -110,6 +113,10 @@ After(function closeSessionForEnv () {
   return closeSession()
 })
 
+After(function rollbackConfigsOnLocal () {
+  return rollbackConfigs(client.globals.backend_url)
+})
+
 After(async function tryToReadBrowserConsoleOnFailure ({ result }) {
   if (client.globals.ocis) {
     return
@@ -119,6 +126,15 @@ After(async function tryToReadBrowserConsoleOnFailure ({ result }) {
     if (logs.length > 0) {
       console.log('\nThe following logs were found in the browser console:\n')
       logs.forEach(log => console.log(log))
+    }
+  }
+})
+
+After(async function tryToReadBrowserConsoleOnFailure ({ result }) {
+  if (result.status === 'failed') {
+    const logs = await getAllLogsWithDateTime()
+    for (const log of logs) {
+      console.log(log)
     }
   }
 })
