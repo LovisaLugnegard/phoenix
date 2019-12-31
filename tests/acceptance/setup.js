@@ -35,6 +35,7 @@ Before(function createSessionForEnv () {
 })
 
 Before(function logSessionInfoOnSauceLabs () {
+  console.log(client.sessionId)
   if (process.env.SAUCE_USERNAME) {
     return client
       .session(function (session) {
@@ -112,6 +113,10 @@ After(function closeSessionForEnv () {
   return closeSession()
 })
 
+After(function rollbackConfigsOnLocal () {
+  return rollbackConfigs(client.globals.backend_url)
+})
+
 After(async function tryToReadBrowserConsoleOnFailure ({ result }) {
   if (client.globals.ocis) {
     return
@@ -121,6 +126,15 @@ After(async function tryToReadBrowserConsoleOnFailure ({ result }) {
     if (logs.length > 0) {
       console.log('\nThe following logs were found in the browser console:\n')
       logs.forEach(log => console.log(log))
+    }
+  }
+})
+
+After(async function tryToReadBrowserConsoleOnFailure ({ result }) {
+  if (result.status === 'failed') {
+    const logs = await getAllLogsWithDateTime()
+    for (const log of logs) {
+      console.log(log)
     }
   }
 })

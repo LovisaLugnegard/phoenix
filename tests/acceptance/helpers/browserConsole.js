@@ -29,3 +29,15 @@ export async function getAllLogsWithDateTime (level = null) {
     .filter(e => !e.message.includes('favicon.ico'))
     .map(formatLog)
 }
+
+exports.checkConsoleErrors = async function () {
+  const logs = await exports.getAllLogs()
+  return logs.filter((entry) => {
+    return entry.level === 'SEVERE'
+  }).map((entry) => {
+    if (entry.message.indexOf('favicon.ico') >= 0) {
+      return
+    }
+    return new Date(entry.timestamp).toUTCString() + ' - ' + cleanupLogMessage(entry.message)
+  })
+}
