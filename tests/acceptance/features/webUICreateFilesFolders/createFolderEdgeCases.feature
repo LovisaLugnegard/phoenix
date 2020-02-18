@@ -37,7 +37,7 @@ Feature: create folder
     And as "user1" folder "sub-folder" should exist inside folder <folder>
     Examples:
       | folder    |
-     #| "?&%0"    |
+#      | "?&%0"    |
       | "^#2929@" |
       | "home"    |
 
