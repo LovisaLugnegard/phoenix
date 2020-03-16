@@ -48,9 +48,13 @@
         <oc-star class="uk-display-block" @click.native.stop="toggleFileFavorite(item)" :shining="item.starred" />
       </div>
       <div class="uk-text-truncate uk-width-expand" :ref="index === 0 ? 'firstRowNameColumn' : null">
-        <oc-file @click.native.stop="item.type === 'folder' ? navigateTo(item.path.substr(1)) : openFileActionBar(item)"
-          :name="$_ocFileName(item)" :extension="item.extension" class="file-row-name" :icon="fileTypeIcon(item)"
-          :filename="item.name" :key="item.id"/>
+        <file-item
+          @click.native.stop="item.type === 'folder' ? navigateTo(item.path.substr(1)) : openFileActionBar(item)"
+          :item="item"
+          :dav-url="davUrl"
+          :show-path="$_isFavoritesList"
+          class="file-row-name"
+          :key="item.id"/>
         <oc-spinner
           v-if="actionInProgress(item)"
           size="small"
@@ -111,6 +115,7 @@
 </template>
 <script>
 import FileList from './FileList.vue'
+import FileItem from './FileItem.vue'
 import NoContentMessage from './NoContentMessage.vue'
 import { mapGetters, mapActions, mapState } from 'vuex'
 
@@ -124,6 +129,7 @@ export default {
   name: 'AllFilesList',
   components: {
     FileList,
+    FileItem,
     StatusIndicators,
     NoContentMessage,
     SortableColumnHeader
@@ -154,6 +160,26 @@ export default {
 
     item () {
       return this.$route.params.item
+    },
+
+    davUrl () {
+      let davUrl
+      // FIXME: use SDK once it switches to DAV v2
+      if (this.publicPage()) {
+        davUrl = [
+          '..',
+          'dav',
+          'public-files'
+        ].join('/')
+      } else {
+        davUrl = [
+          '..',
+          'dav',
+          'files',
+          this.$store.getters.user.id
+        ].join('/')
+      }
+      return this.$client.files.getFileUrl(davUrl)
     },
 
     $_isFavoritesList () {
@@ -236,14 +262,6 @@ export default {
         client: this.$client,
         file: item
       })
-    },
-    $_ocFileName (item) {
-      if (this.$_isFavoritesList) {
-        const pathSplit = item.path.substr(1).split('/')
-        if (pathSplit.length === 2) return `${pathSplit[pathSplit.length - 2]}/${item.basename}`
-        if (pathSplit.length > 2) return `…/${pathSplit[pathSplit.length - 2]}/${item.basename}`
-      }
-      return item.basename
     },
 
     isActionEnabled (item, action) {
