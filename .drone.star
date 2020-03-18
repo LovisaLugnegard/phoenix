@@ -393,7 +393,7 @@ def acceptance():
 									)
 								) +
 								copyFilesForUpload() +
-								runWebuiAcceptanceTests(suite, alternateSuiteName, params['filterTags'], params['extraEnvironment'], browser) +
+								runWebuiAcceptanceTests(suite, alternateSuiteName, params['filterTags'], params['extraEnvironment'], browser, params['runningOnOCIS']) +
 								(
 									uploadScreenshots() +
 									buildGithubComment(suite, alternateSuiteName) +
