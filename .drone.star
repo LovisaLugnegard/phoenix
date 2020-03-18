@@ -548,15 +548,7 @@ def browserService(alternateSuiteName, browser):
 	if browser == 'chrome':
 		return [{
 			'name': 'selenium',
-<<<<<<< HEAD
-<<<<<<< HEAD
 			'image': 'selenium/standalone-chrome-debug:latest',
-=======
-			'image': 'selenium/standalone-chrome-debug:3.141.59-yttrium',
->>>>>>> Update chrome browser for UI tests
-=======
-			'image': 'selenium/standalone-chrome-debug:latest',
->>>>>>> Update selenium chrome to latest
 			'pull': 'always',
 			'volumes': [{
 				'name': 'uploads',

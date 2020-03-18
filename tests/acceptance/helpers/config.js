@@ -97,16 +97,16 @@ export async function getConfigs () {
   return stdOut
 }
 
-async function cacheConfigs (server) {
+export async function cacheConfigs (server) {
   config[server] = await getConfigs()
   return config
 }
 
-async function setConfigs (server, admin = 'admin') {
+export async function setConfigs (server, admin = 'admin') {
   await setSkeletonDirectory(server, admin)
 }
 
-async function rollbackConfigs (server) {
+export async function rollbackConfigs (server) {
   const newConfig = await getConfigs()
 
   const appConfig = _.get(newConfig, 'apps')
@@ -119,10 +119,4 @@ async function rollbackConfigs (server) {
     rollbackSystemConfigs(initialSysConfig, systemConfig),
     rollbackAppConfigs(initialAppConfig, appConfig)
   ])
-}
-
-module.exports = {
-  rollbackConfigs,
-  setConfigs,
-  cacheConfigs
 }
